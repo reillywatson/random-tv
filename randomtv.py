@@ -38,15 +38,21 @@ def writePlaylist(path, episodes):
 	f.write('</trackList></playlist>')
 	f.close()
 
-def getMoviesPath():
-	# TODO: handle this for Windows
+def getDefaultMoviesPath():
+	if sys.platform == 'win32':
+		import ctypes.wintypes
+		CSIDL_MYVIDEO = 14
+		SHGFP_TYPE_CURRENT = 0
+		buf = ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
+		ctypes.windll.shell32.SHGetFolderPathW(0, CSIDL_MYVIDEO, 0, SHGFP_TYPE_CURRENT, buf)
+		return buf.value
 	return os.path.expanduser('~/Movies')
 
 def main():
 	import json
 	
 	shows = []
-	basePath = getMoviesPath()
+	basePath = getDefaultMoviesPath()
 	defaultShow = ''
 	try:
 		j = json.loads(open('conf.json').read())

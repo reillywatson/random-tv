@@ -90,7 +90,7 @@ def main():
 	if numEpisodes.get().isdigit():
 		epsToWatch = int(numEpisodes.get())
 	episodes = randomShows(os.path.join(basePath, selectedShow.get()), epsToWatch)
-	path = '/tmp/playlist.xspf'
+	path = os.tmpnam() + '.xspf'
 	writePlaylist(path, episodes)
 	if sys.platform == 'darwin':
 		os.popen('open ' + path + ' --args -f')

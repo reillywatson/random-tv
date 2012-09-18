@@ -40,29 +40,14 @@ def writePlaylist(path, episodes):
 def main():
 	import os
 	import sys
+	import json
 	
-	# stuff to modify if you want to run this on another machine
-	shows = [
-	'Arrested Development',
-	'Clone High',
-	'Dinosaurs',
-	'Extras',
-	'Family Guy',
-	'Fawlty Towers',
-	'Futurama',
-	'Golden Girls, The',
-	'How I Met Your Mother',
-	"It's Always Sunny In Philadelphia",
-	'Looney Tunes',
-	'Modern Family',
-	'Office, The',
-	'Robot Chicken',
-	'Simpsons, The',
-	'Trailer Park Boys'
-	]
-	basePath = '/Volumes/EXTERNAL/'
-	defaultShow = 'Simpsons, The'
-
+	shows = []
+	j = json.loads(open('conf.json').read())
+	shows = j['shows']
+	basePath = j['basePath']
+	defaultShow = j['defaultShow']
+	
 	master = Tk()
 	master.title('Random TV!')
 	master.protocol("WM_DELETE_WINDOW", lambda: sys.exit(0))

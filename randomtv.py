@@ -39,7 +39,7 @@ def writePlaylist(path, episodes):
 	f.write('</trackList></playlist>')
 	f.close()
 
-def getDefaultMoviesPath():
+def defaultMoviesPath():
 	if sys.platform == 'win32':
 		import ctypes.wintypes
 		CSIDL_MYVIDEO = 14
@@ -49,10 +49,14 @@ def getDefaultMoviesPath():
 		return buf.value
 	return os.path.expanduser('~/Movies')
 
+def playlistPath():
+	import tempfile
+	return tempfile.NamedTemporaryFile().name + '.xspf'
+
 def main():
 	import json
 	
-	basePath = getDefaultMoviesPath()
+	basePath = defaultMoviesPath()
 	shows = [name for name in os.listdir(basePath) if os.path.isdir(os.path.join(basePath, name))]
 	defaultShow = ''
 	try:
@@ -90,7 +94,8 @@ def main():
 	if numEpisodes.get().isdigit():
 		epsToWatch = int(numEpisodes.get())
 	episodes = randomShows(os.path.join(basePath, selectedShow.get()), epsToWatch)
-	path = os.tmpnam() + '.xspf'
+	path = playlistPath()
+	print 'path: ' + path
 	writePlaylist(path, episodes)
 	if sys.platform == 'darwin':
 		os.popen('open ' + path + ' --args -f')

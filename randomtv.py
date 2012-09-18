@@ -1,4 +1,5 @@
 from Tkinter import *
+import tkMessageBox
 import os
 import sys
 
@@ -51,8 +52,8 @@ def getDefaultMoviesPath():
 def main():
 	import json
 	
-	shows = []
 	basePath = getDefaultMoviesPath()
+	shows = [name for name in os.listdir(basePath) if os.path.isdir(os.path.join(basePath, name))]
 	defaultShow = ''
 	try:
 		j = json.loads(open('conf.json').read())
@@ -63,7 +64,8 @@ def main():
 		pass
 	
 	if len(shows) == 0:
-		shows = [name for name in os.listdir(basePath) if os.path.isdir(os.path.join(basePath, name))]
+		tkMessageBox.showerror('No files', 'No TV shows found.  Maybe you want to create a conf.json file.')
+		return
 	if defaultShow == '':
 		defaultShow = shows[0]
 	master = Tk()
@@ -90,7 +92,11 @@ def main():
 	episodes = randomShows(os.path.join(basePath, selectedShow.get()), epsToWatch)
 	path = '/tmp/playlist.xspf'
 	writePlaylist(path, episodes)
-	os.popen('open ' + path + ' --args -f')
+	if sys.platform == 'darwin':
+		os.popen('open ' + path + ' --args -f')
+	else:
+		os.startfile(path)
+		
 
 if __name__ == '__main__':
 	main()

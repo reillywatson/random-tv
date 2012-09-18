@@ -1,4 +1,6 @@
 from Tkinter import *
+import os
+import sys
 
 def ismovie(file):
 	extensions = ['.asf', '.avi', '.divx', '.flv', '.h264', '.m4v', '.mkv', '.mov', '.mp4', '.mpeg', '.mpg', '.wmv']
@@ -6,7 +8,6 @@ def ismovie(file):
 	return fileext in extensions
 
 def findFiles(base):
-	import os
 	files = []
 	for root, dirnames, filenames in os.walk(base):
 		for f in filenames:
@@ -37,17 +38,28 @@ def writePlaylist(path, episodes):
 	f.write('</trackList></playlist>')
 	f.close()
 
+def getMoviesPath():
+	# TODO: handle this for Windows
+	return os.path.expanduser('~/Movies')
+
 def main():
-	import os
-	import sys
 	import json
 	
 	shows = []
-	j = json.loads(open('conf.json').read())
-	shows = j['shows']
-	basePath = j['basePath']
-	defaultShow = j['defaultShow']
+	basePath = getMoviesPath()
+	defaultShow = ''
+	try:
+		j = json.loads(open('conf.json').read())
+		shows = j['shows']
+		basePath = j['basePath']
+		defaultShow = j['defaultShow']
+	except:
+		pass
 	
+	if len(shows) == 0:
+		shows = [name for name in os.listdir(basePath) if os.path.isdir(os.path.join(basePath, name))]
+	if defaultShow == '':
+		defaultShow = shows[0]
 	master = Tk()
 	master.title('Random TV!')
 	master.protocol("WM_DELETE_WINDOW", lambda: sys.exit(0))
@@ -69,7 +81,7 @@ def main():
 	epsToWatch = 1
 	if numEpisodes.get().isdigit():
 		epsToWatch = int(numEpisodes.get())
-	episodes = randomShows(basePath+selectedShow.get(), epsToWatch)
+	episodes = randomShows(os.path.join(basePath, selectedShow.get()), epsToWatch)
 	path = '/tmp/playlist.xspf'
 	writePlaylist(path, episodes)
 	os.popen('open ' + path + ' --args -f')
